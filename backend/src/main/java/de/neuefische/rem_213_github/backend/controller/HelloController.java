@@ -12,12 +12,13 @@ import springfox.documentation.annotations.ApiIgnore;
 import static de.neuefische.rem_213_github.backend.controller.HelloController.HELLO_TAG;
 import static org.springframework.http.ResponseEntity.ok;
 
+@Tag(name = HELLO_TAG, description = "This controller only says Hello to REM-21-3!")
 @Api(
         tags = HELLO_TAG
 )
+@ApiIgnore
 @CrossOrigin
 @RestController
-@Tag(name = HELLO_TAG, description = "This call only says Hello to REM-21-3!")
 public class HelloController {
 
     public static final String HELLO_TAG = "Hello";
