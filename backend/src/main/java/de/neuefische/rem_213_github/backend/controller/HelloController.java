@@ -13,6 +13,7 @@ public class HelloController {
 
     @GetMapping("/")
     public ResponseEntity<String> hello() {
-        return ok("<html><body><h1>Hello REM 21-3</h1></body></html>");
+        String cssStyle = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);";
+        return ok(String.format("<html><body><h1 style=\"%s\">Hello REM 21-3</h1></body></html>", cssStyle));
     }
 }
