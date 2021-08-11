@@ -28,10 +28,11 @@ public class HelloController {
     public ResponseEntity<String> hello() {
         String cssStyle = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);";
         String swaggerLink = "/api/rem213/swagger-ui/";
+        String linkDesc = "Github Review Karma Swagger REM 21-3";
 
         return ok(String.format(
-                "<html><body><h1 style=\"%s\"><a href=\"%s\" alt=\"\">Swagger REM 21-3</a></h1></body></html>",
-                cssStyle, swaggerLink
+                "<html><body><h1 style=\"%s\"><a href=\"%s\">%s</a></h1></body></html>",
+                cssStyle, swaggerLink, linkDesc
         ));
     }
 }
