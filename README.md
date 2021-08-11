@@ -24,3 +24,7 @@
 * This app will be automatically deployed at Heroku on pushes to the main branch. API available at 
 
 [Hosted at Heroku](https://rem-21-3-github.herokuapp.com/api/rem213)
+
+* Swagger is available at:
+
+[Hosted Swagger at Heroku](http://rem-21-3-github.herokuapp.com/api/rem213/swagger-ui/)
