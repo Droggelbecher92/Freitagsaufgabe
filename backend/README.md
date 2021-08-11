@@ -2,11 +2,17 @@
 
 * This project requires __Java 16__ and __MAVEN__, build by execute in the project root:
 
-`mvn clean package`
-
 * Clone project by execute:
 
 `git clone git@github.com:neuefische/rem-21-3-github.git`
+
+* Build the backend by
+
+`mvn clean package`
+
+* Run the backend by
+
+`mvn spring-boot:run`
 
 * This app will be automatically deployed at Heroku on pushes to the main branch. API available at
 
