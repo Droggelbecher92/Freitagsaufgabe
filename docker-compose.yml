@@ -9,7 +9,7 @@ version: "2.1"
 #
 
 services:
-  customer-postgres:
+  rem213-postgres:
     image: postgres:12.4
     container_name: rem213-postgres
     mem_limit: 50m
