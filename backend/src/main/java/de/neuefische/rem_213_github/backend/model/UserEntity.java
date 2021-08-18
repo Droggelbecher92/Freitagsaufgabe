@@ -26,4 +26,28 @@ public class UserEntity {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        UserEntity that = (UserEntity) o;
+
+        if (this.getId() != null) {
+            return this.getId().equals(that.getId());
+        }
+
+        return this.getName() != null && this.getName().equals(that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? getName().hashCode() : getId().hashCode();
+    }
 }
