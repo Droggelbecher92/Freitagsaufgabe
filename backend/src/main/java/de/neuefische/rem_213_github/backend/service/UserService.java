@@ -1,5 +1,6 @@
 package de.neuefische.rem_213_github.backend.service;
 
+import de.neuefische.rem_213_github.backend.config.UserServiceConfigProperties;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
 import de.neuefische.rem_213_github.backend.repo.UserRepository;
 import lombok.Getter;
@@ -18,11 +19,16 @@ import static org.springframework.util.StringUtils.hasText;
 @Setter
 public class UserService {
 
+//    @Value("${rem213.user-service.avatar-url}")
+//    private String avatarUrl;
+
     private UserRepository userRepository;
+    private UserServiceConfigProperties userServiceConfigProperties;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, UserServiceConfigProperties userServiceConfigProperties) {
         this.userRepository = userRepository;
+        this.userServiceConfigProperties = userServiceConfigProperties;
     }
 
     public UserEntity create(String name) {
@@ -38,6 +44,7 @@ public class UserService {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setName(name);
+        userEntity.setAvatarUrl(userServiceConfigProperties.getAvatarUrl());
 
         return userRepository.save(userEntity);
     }

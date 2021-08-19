@@ -1,0 +1,9 @@
+profile:
+  datasource:
+    url: postgresql://localhost:5432/rem213
+    user: admin
+    pass: 12345
+
+rem213:
+    user-service:
+      avatar-url: "http://local.de"

@@ -1,18 +1,23 @@
 ## This repo contains the SpringBoot Github Review Karma App we've made during our Java 21-3 course.
 
-* This project requires __Java 16__ and __MAVEN__, build by execute in the project root:
+* This project requires __Java 16__ , __MAVEN__ and __DOCKER_COMPOSE__ build by execute in the project root:
 
 * Clone project by execute:
 
 `git clone git@github.com:neuefische/rem-21-3-github.git`
+         
+* Startup local database in docker container (startup local [Docker](https://www.docker.com/products/docker-desktop) before)
 
-* Build the backend by
+`docker-compose up -d`
 
-`mvn clean package`
+* Build the backend with profile 'local' by
 
-* Run the backend by
+`mvn clean package -Plocal`
 
-`mvn spring-boot:run`
+* Run the backend with profile 'local' by
+
+`mvn spring-boot:run -Dspring.profiles.active=local
+`
 
 * This app will be automatically deployed at Heroku on pushes to the main branch. API available at
 

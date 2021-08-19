@@ -1,10 +1,12 @@
 spring:
+  profiles:
+    active: @spring.profiles.active@
   application:
     name: rem213
   datasource:
-    url: jdbc:postgresql://localhost:5432/rem213
-    username: admin
-    password: 12345
+    url: jdbc:${profile.datasource.url}
+    username: ${profile.datasource.user}
+    password: ${profile.datasource.pass}
     driver-class-name: org.postgresql.Driver
   jpa:
     generate-ddl: true
