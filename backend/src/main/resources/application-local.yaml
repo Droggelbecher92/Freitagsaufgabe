@@ -5,5 +5,5 @@ profile:
     pass: 12345
 
 rem213:
-    user-service:
-      avatar-url: "http://local.de"
+  github-client:
+    access-token: "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"

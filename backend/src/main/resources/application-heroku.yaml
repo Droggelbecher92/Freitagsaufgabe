@@ -5,5 +5,5 @@ profile:
     pass: ${DATABASE_PASS}
 
 rem213:
-    user-service:
-      avatar-url: "http://heroku.de"
+  github-client:
+    access-token: ${GITHUB_TOKEN}

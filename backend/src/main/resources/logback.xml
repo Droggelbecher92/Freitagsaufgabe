@@ -11,6 +11,7 @@
 
     <!-- Set level = DEBUG to get feign http output -->
     <logger name="de.neuefische.rem_213_github.backend.rest.nasa" level="INFO"/>
+    <logger name="de.neuefische.rem_213_github.backend.rest.github" level="INFO"/>
     <logger name="de.neuefische.rem_213_github" level="INFO"/>
 
     <root level="INFO">

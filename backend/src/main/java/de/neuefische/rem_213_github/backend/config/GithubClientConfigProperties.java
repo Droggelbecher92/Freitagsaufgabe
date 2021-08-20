@@ -4,22 +4,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "rem213.nasa-client")
-public class NasaClientConfigProperties {
+@ConfigurationProperties(prefix = "rem213.github-client")
+public class GithubClientConfigProperties {
 
-    private String apiKey;
     private String accessToken;
 
-    public String getApiKey() {
-        return apiKey == null ? "DEMO_KEY" : apiKey;
-    }
-
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
     public String getAccessToken() {
-        return accessToken == null ? "MY-Token" : accessToken;
+        return accessToken;
     }
 
     public void setAccessToken(String accessToken) {
