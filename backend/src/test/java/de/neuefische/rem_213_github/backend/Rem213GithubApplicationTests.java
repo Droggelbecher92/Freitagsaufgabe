@@ -5,7 +5,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest
-@ContextConfiguration(classes = SpringTestConfig.class)
+@ContextConfiguration(classes = SpringTestContextConfiguration.class)
 class Rem213GithubApplicationTests {
 
     @Test

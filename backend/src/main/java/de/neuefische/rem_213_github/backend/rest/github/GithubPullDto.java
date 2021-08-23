@@ -10,4 +10,5 @@ public class GithubPullDto {
     String url;
     String title;
     String state;
+    GithubUserDto user;
 }

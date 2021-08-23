@@ -18,9 +18,17 @@ public interface GithubAPI {
     @RequestLine("GET /user")
     GithubUserDto getUser(@Param(ACCESS_TOKEN_PARAM) String accessToken);
 
-    @RequestLine("GET /users/{owner}/repos")
-    List<GithubRepoDto> getUserRepos(@Param(ACCESS_TOKEN_PARAM) String accessToken, @Param("owner") String userName);
+    @RequestLine("GET /users/{owner}/repos?page={page}")
+    List<GithubRepoDto> getUserRepos(@Param(ACCESS_TOKEN_PARAM) String accessToken,
+                                     @Param("owner") String userName, @Param("page") int page);
 
     @RequestLine("GET /repos/{owner}/{repo}/pulls")
-    List<GithubPullDto> getRepoPulls(@Param(ACCESS_TOKEN_PARAM) String accessToken, @Param("owner") String userName, @Param("repo") String repoName);
+    List<GithubPullDto> getRepoPulls(@Param(ACCESS_TOKEN_PARAM) String accessToken,
+                                     @Param("owner") String userName, @Param("repo") String repoName);
+
+    @RequestLine("POST /repos/{owner}/{repo}/pulls")
+    GithubPullDto createPullRequest(@Param(ACCESS_TOKEN_PARAM) String accessToken,
+                                    @Param("owner") String userName, @Param("repo") String repoName,
+                                    GithubPullRequestDto githubPullRequestDto);
+
 }

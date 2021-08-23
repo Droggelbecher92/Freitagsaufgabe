@@ -5,6 +5,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = SpringTestConfig.class)
+@ContextConfiguration(classes = SpringTestContextConfiguration.class)
 public abstract class SpringBootTests {
 }

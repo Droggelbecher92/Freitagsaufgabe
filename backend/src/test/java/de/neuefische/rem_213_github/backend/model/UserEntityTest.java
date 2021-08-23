@@ -46,6 +46,7 @@ public class UserEntityTest extends SpringBootTests {
         assertNotNull(createdEntity.getId());
         assertEquals(createdEntity, userEntity);
 
+        // additional equals hash code test by adding same instance to set twice
         Set<UserEntity> users = new HashSet<>();
         users.add(userEntity);
         users.add(createdEntity);

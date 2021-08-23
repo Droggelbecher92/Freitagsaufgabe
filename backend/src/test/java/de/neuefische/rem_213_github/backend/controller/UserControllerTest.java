@@ -12,11 +12,12 @@ import org.springframework.test.context.ActiveProfiles;
 import javax.annotation.Resource;
 import java.util.Optional;
 
-import static de.neuefische.rem_213_github.backend.SpringTestConfig.MOCKED_USER_SERVICE_PROFILE;
+import static de.neuefische.rem_213_github.backend.SpringTestContextConfiguration.MOCKED_SERVICES_PROFILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@ActiveProfiles(MOCKED_USER_SERVICE_PROFILE)
+@ActiveProfiles(MOCKED_SERVICES_PROFILE)
 public class UserControllerTest extends SpringBootTests {
 
     @Resource
@@ -26,16 +27,29 @@ public class UserControllerTest extends SpringBootTests {
     private UserService userService; // with the profile active this service is a mock
 
     @Test
-    public void testGet() {
+    public void testGetFindUserOk() {
+        // GIVEN
         Optional<UserEntity> userEntityOptional = Optional.of(new UserEntity());
 
         String name = "name";
         when(userService.find(name)).thenReturn(userEntityOptional);
 
+        // WHEN
         ResponseEntity<User> userResponseEntity = userController.find(name);
-        assertEquals(HttpStatus.OK, userResponseEntity.getStatusCode());
 
-        userResponseEntity = userController.find("unknown");
+        // THEN
+        assertEquals(HttpStatus.OK, userResponseEntity.getStatusCode());
+    }
+
+    @Test
+    public void testGetFindUserNotFound() {
+        // GIVEN
+        when(userService.find(anyString())).thenReturn(Optional.empty());
+
+        // WHEN
+        ResponseEntity<User> userResponseEntity = userController.find("unknown");
+
+        // THEN
         assertEquals(HttpStatus.NOT_FOUND, userResponseEntity.getStatusCode());
     }
 }
