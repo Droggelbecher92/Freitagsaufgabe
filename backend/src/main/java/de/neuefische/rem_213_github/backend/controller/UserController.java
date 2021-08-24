@@ -62,7 +62,9 @@ public class UserController {
     })
     public ResponseEntity<User> create(@RequestBody User user) {
         try {
-            UserEntity createdUserEntity = userService.create(user.getName());
+            UserEntity userEntity = map(user);
+
+            UserEntity createdUserEntity = userService.create(userEntity);
             User createdUser = map(createdUserEntity);
             return ok(createdUser);
 
@@ -120,6 +122,13 @@ public class UserController {
                 .name(userEntity.getName())
                 .avatar(userEntity.getAvatarUrl())
                 .build();
+    }
+
+    private UserEntity map(User user) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setName(user.getName());
+        userEntity.setAvatarUrl(user.getAvatar());
+        return userEntity;
     }
 
     private List<User> map(List<UserEntity> userEntities) {

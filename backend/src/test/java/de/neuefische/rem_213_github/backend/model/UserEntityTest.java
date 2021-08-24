@@ -68,4 +68,30 @@ public class UserEntityTest extends SpringBootTests {
         // THEN
         assertEquals(expectedUser, actualUserOpt.get());
     }
+
+    @Test
+    @Transactional
+    public void testUserReposWillBePersisted() {
+        // GIVEN
+        RepoEntity repoEntity = new RepoEntity();
+        repoEntity.setName("repo");
+
+        Set<RepoEntity> repoEntities = new HashSet<>();
+        repoEntities.add(repoEntity);
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setName("foo");
+        userEntity.setRepos(repoEntities);
+
+        // WHEN
+        UserEntity actualUser = userRepository.save(userEntity);
+
+        // THEN
+        assertNotNull(actualUser.getId(), "User must have an id assigned");
+
+        Set<RepoEntity> actualUserRepos = actualUser.getRepos();
+        assertEquals(1, actualUserRepos.size());
+
+        assertNotNull(actualUserRepos.iterator().next().getId(), "Repo must have an id assigned");
+    }
 }

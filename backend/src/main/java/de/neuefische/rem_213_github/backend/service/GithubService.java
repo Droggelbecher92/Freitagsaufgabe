@@ -1,24 +1,32 @@
 package de.neuefische.rem_213_github.backend.service;
 
 import de.neuefische.rem_213_github.backend.api.GithubPullRequest;
+import de.neuefische.rem_213_github.backend.model.RepoEntity;
+import de.neuefische.rem_213_github.backend.model.UserEntity;
 import de.neuefische.rem_213_github.backend.rest.github.GithubClient;
 import de.neuefische.rem_213_github.backend.rest.github.GithubPullDtos;
 import de.neuefische.rem_213_github.backend.rest.github.GithubPullRequestDto;
+import de.neuefische.rem_213_github.backend.rest.github.GithubRepoDto;
 import de.neuefische.rem_213_github.backend.rest.github.GithubRepoDtos;
 import de.neuefische.rem_213_github.backend.rest.github.GithubUserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class GithubService {
 
     private final GithubClient githubClient;
+    private final UserService userService;
 
     @Autowired
-    public GithubService(GithubClient githubClient) {
+    public GithubService(GithubClient githubClient, UserService userService) {
         this.githubClient = githubClient;
+        this.userService = userService;
     }
 
     public GithubUserDto getWhoAmI() {
@@ -26,7 +34,47 @@ public class GithubService {
     }
 
     public GithubRepoDtos getUserRepos(GithubUserDto githubUserDto) {
-        return githubClient.getUserRepos(githubUserDto.getLogin());
+        GithubRepoDtos githubRepoDtos = githubClient.getUserRepos(githubUserDto.getLogin());
+
+        List<GithubRepoDto> githubRepoDtoList = githubRepoDtos.getGithubRepoDtos();
+        if (githubRepoDtoList.isEmpty()) {
+            return githubRepoDtos;
+        }
+
+        Optional<UserEntity> existingUserEntityOpt = userService.find(githubUserDto.getName());
+        if (existingUserEntityOpt.isPresent()) {
+            // update existing user
+            UserEntity existingUserEntity = existingUserEntityOpt.get();
+
+            UserEntity userEntity = new UserEntity();
+            Set<RepoEntity> userRepos = map(githubRepoDtoList);
+            userEntity.addRepos(userRepos);
+
+            userService.update(existingUserEntity.getId(), userEntity);
+
+        } else {
+            // create new user with all repos
+            UserEntity userEntity = new UserEntity();
+            userEntity.setAvatarUrl(githubUserDto.getAvatar_url());
+            userEntity.setName(githubUserDto.getName());
+
+            Set<RepoEntity> userRepos = map(githubRepoDtoList);
+            userEntity.addRepos(userRepos);
+
+            userService.create(userEntity);
+        }
+
+        return githubRepoDtos;
+    }
+
+    private Set<RepoEntity> map(List<GithubRepoDto> githubRepoDtoList) {
+        Set<RepoEntity> userRepos = new HashSet<>();
+        for (GithubRepoDto githubRepoDto : githubRepoDtoList) {
+            RepoEntity repoEntity = new RepoEntity();
+            repoEntity.setName(githubRepoDto.getName());
+            userRepos.add(repoEntity);
+        }
+        return userRepos;
     }
 
     public Optional<GithubPullDtos> getPulls(GithubUserDto githubUserDto, String repoName) {

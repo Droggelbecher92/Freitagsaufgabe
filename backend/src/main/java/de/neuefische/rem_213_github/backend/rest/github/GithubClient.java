@@ -29,16 +29,21 @@ public class GithubClient {
 
     public GithubRepoDtos getUserRepos(String login) {
         GithubRepoDtos githubRepoDtos = new GithubRepoDtos();
+        try {
+            int page = 1;
+            List<GithubRepoDto> githubRepoDtoList;
+            do {
+                githubRepoDtoList = githubAPI.getUserRepos(getAccessToken(), login, page);
+                githubRepoDtos.addGithubRepoDtos(githubRepoDtoList);
+                page++;
 
-        int page = 1;
-        List<GithubRepoDto> githubRepoDtoList;
-        do {
-            githubRepoDtoList = githubAPI.getUserRepos(getAccessToken(), login, page);
-            githubRepoDtos.addGithubRepoDtos(githubRepoDtoList);
-            page++;
+            } while (githubRepoDtoList == null || !githubRepoDtoList.isEmpty());
 
-        } while (githubRepoDtoList == null || !githubRepoDtoList.isEmpty());
-
+        } catch (FeignException e) {
+            String errorMsg = String.format("No repos found for user=%s", login);
+            log.info(errorMsg);
+            log.debug(String.format("%s : ex-msg %s", errorMsg, e.getMessage()));
+        }
         return githubRepoDtos;
     }
 
