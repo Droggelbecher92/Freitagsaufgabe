@@ -56,10 +56,12 @@ class AuthControllerTest {
         // Given
         String username = "bill";
         String password = "12345";
+        String role = "user";
         String hashedPassword = passwordEncoder.encode(password);
         userRepository.save(
                 UserEntity.builder()
                         .name(username)
+                        .role(role)
                         .password(hashedPassword).build()
         );
         Credentials credentials = Credentials.builder()
@@ -76,6 +78,7 @@ class AuthControllerTest {
         Claims claims = Jwts.parser().setSigningKey(jwtConfig.getSecret())
                 .parseClaimsJws(token).getBody();
         assertThat(claims.getSubject(), is(username));
+        assertThat(claims.get("role", String.class), is(role));
     }
 
     @Test
