@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityExistsException;
 import java.util.LinkedList;
@@ -123,7 +124,6 @@ public class UserController {
     @PutMapping(value = "/password",produces = APPLICATION_JSON_VALUE,consumes = APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = SC_BAD_REQUEST, message = "Unable to create password with blank field"),
-            @ApiResponse(code = SC_CONFLICT, message = "Unable to create Password, Platzhalter")
     })
 
     public ResponseEntity<CreatedUser> updatePassword(@RequestBody Password newPassword,@AuthenticationPrincipal UserEntity user){
@@ -136,6 +136,31 @@ public class UserController {
         CreatedUser createdUser = map(userEntityOptional.get(),newPassword.getPassword());
         return ok(createdUser);
 
+    }
+
+
+    @PutMapping(value = "/{username}/reset-password",produces = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = SC_NOT_FOUND, message = "Unable to create Password, user not found"),
+            @ApiResponse(code = SC_BAD_REQUEST, message = "Admin-Password cannot be reset!")
+    })
+
+    public ResponseEntity<CreatedUser> resetPassword(@PathVariable String username){
+        String password = userService.generatePassword();
+        try {
+            Optional<UserEntity> userEntityOptional = userService.resetPassword(username,password);
+            CreatedUser createdUser = map(userEntityOptional.get(),password);
+            return ok(createdUser);
+        }
+        catch (ResponseStatusException e) {
+            if (e.getStatus().equals(HttpStatus.BAD_REQUEST)) {
+                return ResponseEntity.badRequest().build();
+            } else if (e.getStatus().equals(HttpStatus.NOT_FOUND)) {
+                return ResponseEntity.notFound().build();
+            } else {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
     }
 
     private User map(UserEntity userEntity) {

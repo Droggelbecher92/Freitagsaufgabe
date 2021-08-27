@@ -9,10 +9,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.persistence.EntityExistsException;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -122,5 +125,19 @@ public class UserService {
 
     public String hashPassword(String password) {
         return passwordEncoder.encode(password);
+    }
+
+    public Optional<UserEntity> resetPassword(String username, String newPassword) {
+        Optional<UserEntity> userOpt = userRepository.findByName(username);
+        if (userOpt.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User wasn't found");
+        } else if (userOpt.get().getRole().equals("ADMIN")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Admin cannot be resetet, please contact service!");
+        }
+        String newHashedPassword = hashPassword(newPassword);
+        UserEntity userToChange = userOpt.get();
+        userToChange.setPassword(newHashedPassword);
+        userRepository.save(userToChange);
+        return Optional.of(userToChange);
     }
 }
