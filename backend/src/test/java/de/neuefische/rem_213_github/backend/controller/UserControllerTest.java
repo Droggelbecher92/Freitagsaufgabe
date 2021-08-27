@@ -1,9 +1,9 @@
 package de.neuefische.rem_213_github.backend.controller;
 
-import de.neuefische.rem_213_github.backend.api.User;
-import de.neuefische.rem_213_github.backend.api.CreatedUser;
+import de.neuefische.rem_213_github.backend.api.*;
 import de.neuefische.rem_213_github.backend.config.JwtConfig;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
+import de.neuefische.rem_213_github.backend.repo.UserRepository;
 import de.neuefische.rem_213_github.backend.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -32,12 +33,12 @@ import static org.mockito.Mockito.when;
         properties = "spring.profiles.active:h2",
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
-public class UserControllerTest{
+public class UserControllerTest {
 
     @LocalServerPort
     private int port;
 
-    private String url(){
+    private String url() {
         return "http://localhost:" + port + "/user";
     }
 
@@ -52,6 +53,12 @@ public class UserControllerTest{
 
     @Resource
     private TestRestTemplate restTemplate;
+
+    @Resource
+    private PasswordEncoder passwordEncoder;
+
+    @Resource
+    private UserRepository userRepository;
 
     @Test
     public void testGetFindUserOk() {
@@ -81,7 +88,7 @@ public class UserControllerTest{
     }
 
     @Test
-    public void testPostCreatedUserAdded(){
+    public void testPostCreatedUserAdded() {
         // GIVEN
         String username = "BobAdmin";
         Instant now = Instant.now();
@@ -89,7 +96,7 @@ public class UserControllerTest{
         Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
         String token = Jwts.builder()
                 .setClaims(new HashMap<>(
-                        Map.of("role","ADMIN")
+                        Map.of("role", "ADMIN")
                 ))
                 .setIssuedAt(iat)
                 .setExpiration(exp)
@@ -111,7 +118,75 @@ public class UserControllerTest{
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody().getPassword().length(), is(10));
-        assertThat(userService.find("maxi").get().getName(),is("maxi") );
+        assertThat(userService.find("maxi").get().getName(), is("maxi"));
 
     }
+
+    @Test
+    public void testPutPasswordIsUpdated() {
+        // Given
+        String username = "bill";
+        String password = "12345";
+        String role = "user";
+        Password newPassword = Password.builder().password("1111").build();
+        String hashedPassword = passwordEncoder.encode(password);
+        userRepository.save(
+                UserEntity.builder()
+                        .name(username)
+                        .role(role)
+                        .password(hashedPassword).build()
+        );
+        Instant now = Instant.now();
+        Date iat = Date.from(now);
+        Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
+        String token = Jwts.builder()
+                .setClaims(new HashMap<>(
+                        Map.of("role", "USER")
+                ))
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .setSubject(username)
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret()).compact();
+
+        // When
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        String url = url() + "/password";
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url, HttpMethod.PUT, new HttpEntity<>(newPassword, headers), CreatedUser.class);
+
+        // Then
+        assertThat(response.getBody().getPassword() , is(newPassword.getPassword()));
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+    }
+
+    @Test
+    public void testPutPasswordUserNotFound() {
+        // Given
+        String username = "bill";
+        Password newPassword = Password.builder().password("1111").build();
+
+        Instant now = Instant.now();
+        Date iat = Date.from(now);
+        Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
+        String token = Jwts.builder()
+                .setClaims(new HashMap<>(
+                        Map.of("role", "USER")
+                ))
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .setSubject(username)
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret()).compact();
+
+        // When
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        String url = url() + "/password";
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url, HttpMethod.PUT, new HttpEntity<>(newPassword, headers), CreatedUser.class);
+
+        // Then
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
+    }
+
 }
