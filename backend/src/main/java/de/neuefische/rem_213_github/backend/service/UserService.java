@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityExistsException;
@@ -27,11 +28,13 @@ public class UserService {
 
     private UserRepository userRepository;
     private UserServiceConfigProperties userServiceConfigProperties;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserServiceConfigProperties userServiceConfigProperties) {
+    public UserService(UserRepository userRepository, UserServiceConfigProperties userServiceConfigProperties, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userServiceConfigProperties = userServiceConfigProperties;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserEntity create(UserEntity userEntity) {
@@ -96,5 +99,9 @@ public class UserService {
 
     public List<UserEntity> findAll() {
         return userRepository.findAll();
+    }
+
+    public String hashPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 }
