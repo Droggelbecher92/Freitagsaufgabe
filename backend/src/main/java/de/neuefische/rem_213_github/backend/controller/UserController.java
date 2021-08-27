@@ -1,6 +1,7 @@
 package de.neuefische.rem_213_github.backend.controller;
 
 import de.neuefische.rem_213_github.backend.api.User;
+import de.neuefische.rem_213_github.backend.api.UserPassword;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
 import de.neuefische.rem_213_github.backend.service.UserService;
 import io.swagger.annotations.Api;
@@ -55,20 +56,23 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(produces = APPLICATION_JSON_VALUE,consumes = APPLICATION_JSON_VALUE)
     @ApiResponses(value = {
             @ApiResponse(code = SC_BAD_REQUEST, message = "Unable to create User with blank name"),
             @ApiResponse(code = SC_CONFLICT, message = "Unable to create User, user already exists")
     })
-    public ResponseEntity<String> create(@RequestBody User user) {
+    public ResponseEntity<UserPassword> create(@RequestBody User user) {
         try {
             UserEntity userEntity = map(user);
             String password = userService.generatePassword();
             userEntity.setPassword(userService.hashPassword(password));
             userEntity.setRole("USER");
             UserEntity createdUserEntity = userService.create(userEntity);
-            User createdUser = map(createdUserEntity);
-            return ok(password);
+            UserPassword userPassword = UserPassword.builder()
+                    .username(user.getName())
+                    .password(password).build();
+
+            return ok(userPassword);
 
         } catch (IllegalArgumentException e) {
             return badRequest().build();

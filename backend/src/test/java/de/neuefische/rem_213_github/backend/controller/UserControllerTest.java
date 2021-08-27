@@ -3,6 +3,7 @@ package de.neuefische.rem_213_github.backend.controller;
 import de.neuefische.rem_213_github.backend.SpringBootTests;
 import de.neuefische.rem_213_github.backend.api.Credentials;
 import de.neuefische.rem_213_github.backend.api.User;
+import de.neuefische.rem_213_github.backend.api.UserPassword;
 import de.neuefische.rem_213_github.backend.config.JwtConfig;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
 import de.neuefische.rem_213_github.backend.service.UserService;
@@ -108,12 +109,12 @@ public class UserControllerTest{
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
-        ResponseEntity<String> response = restTemplate
-                .exchange(url(), HttpMethod.POST, new HttpEntity<>(newUser, headers), String.class);
+        ResponseEntity<UserPassword> response = restTemplate
+                .exchange(url(), HttpMethod.POST, new HttpEntity<>(newUser, headers), UserPassword.class);
         // THEN
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(response.getBody().length(), is(10));
+        assertThat(response.getBody().getPassword().length(), is(10));
         assertThat(userService.find("maxi").get().getName(),is("maxi") );
 
     }
