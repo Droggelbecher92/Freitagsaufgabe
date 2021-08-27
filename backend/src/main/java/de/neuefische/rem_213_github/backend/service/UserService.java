@@ -1,5 +1,6 @@
 package de.neuefische.rem_213_github.backend.service;
 
+import de.neuefische.rem_213_github.backend.api.User;
 import de.neuefische.rem_213_github.backend.config.UserServiceConfigProperties;
 import de.neuefische.rem_213_github.backend.model.RepoEntity;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
@@ -95,6 +96,24 @@ public class UserService {
 
     public String generatePassword(){
         return RandomStringUtils.randomAlphanumeric(10);
+    }
+
+    public Optional<UserEntity> updatePassword (UserEntity userEntity, String newPassword){
+        if(newPassword==null || newPassword.length()<1){
+            return Optional.empty();
+        }
+        String newHashedPassword = hashPassword(newPassword);
+        userEntity.setPassword(newHashedPassword);
+        Optional<UserEntity> dbUserOptional=userRepository.findByName(userEntity.getName());
+        if(dbUserOptional.isEmpty()){
+            return Optional.empty();
+        }
+        UserEntity dbUser = dbUserOptional.get();
+        dbUser.setPassword(newHashedPassword);
+        userRepository.save(dbUser);
+
+        return Optional.of(dbUser);
+
     }
 
     public List<UserEntity> findAll() {

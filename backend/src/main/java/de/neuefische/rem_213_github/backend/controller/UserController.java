@@ -1,5 +1,6 @@
 package de.neuefische.rem_213_github.backend.controller;
 
+import de.neuefische.rem_213_github.backend.api.Password;
 import de.neuefische.rem_213_github.backend.api.User;
 import de.neuefische.rem_213_github.backend.api.CreatedUser;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
@@ -13,14 +14,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityExistsException;
 import java.util.LinkedList;
@@ -69,7 +64,9 @@ public class UserController {
             userEntity.setRole("USER");
             UserEntity createdUserEntity = userService.create(userEntity);
             CreatedUser createdUser = CreatedUser.builder()
-                    .username(user.getName())
+                    .username(createdUserEntity.getName())
+                    .role(createdUserEntity.getRole())
+                    .avatarUrl(createdUserEntity.getAvatarUrl())
                     .password(password).build();
 
             return ok(createdUser);
@@ -123,6 +120,24 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
+    @PutMapping(value = "/password",produces = APPLICATION_JSON_VALUE,consumes = APPLICATION_JSON_VALUE)
+    @ApiResponses(value = {
+            @ApiResponse(code = SC_BAD_REQUEST, message = "Unable to create password with blank field"),
+            @ApiResponse(code = SC_CONFLICT, message = "Unable to create Password, Platzhalter")
+    })
+
+    public ResponseEntity<CreatedUser> updatePassword(@RequestBody Password newPassword,@AuthenticationPrincipal UserEntity user){
+
+        Optional<UserEntity> userEntityOptional = userService.updatePassword(user, newPassword.getPassword());
+        if(userEntityOptional.isEmpty()){
+            return   ResponseEntity.badRequest().build();
+        }
+
+        CreatedUser createdUser = map(userEntityOptional.get(),newPassword.getPassword());
+        return ok(createdUser);
+
+    }
+
     private User map(UserEntity userEntity) {
         return User.builder()
                 .name(userEntity.getName())
@@ -144,5 +159,14 @@ public class UserController {
             users.add(user);
         }
         return users;
+    }
+
+    private CreatedUser map(UserEntity userEntity, String password){
+       return CreatedUser.builder()
+                .username(userEntity.getName())
+                .password(password)
+                .role(userEntity.getRole())
+                .avatarUrl(userEntity.getAvatarUrl())
+                .build();
     }
 }
