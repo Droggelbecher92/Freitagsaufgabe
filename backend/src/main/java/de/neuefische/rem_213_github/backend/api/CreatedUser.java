@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserPassword {
+public class CreatedUser {
 
     private String username;
     private String password;
+    private String role;
+    private String avatarUrl;
 
 }

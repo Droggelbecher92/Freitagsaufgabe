@@ -1,9 +1,7 @@
 package de.neuefische.rem_213_github.backend.controller;
 
-import de.neuefische.rem_213_github.backend.SpringBootTests;
-import de.neuefische.rem_213_github.backend.api.Credentials;
 import de.neuefische.rem_213_github.backend.api.User;
-import de.neuefische.rem_213_github.backend.api.UserPassword;
+import de.neuefische.rem_213_github.backend.api.CreatedUser;
 import de.neuefische.rem_213_github.backend.config.JwtConfig;
 import de.neuefische.rem_213_github.backend.model.UserEntity;
 import de.neuefische.rem_213_github.backend.service.UserService;
@@ -14,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
 import java.time.Duration;
@@ -24,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static de.neuefische.rem_213_github.backend.SpringTestContextConfiguration.MOCKED_SERVICES_PROFILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,8 +105,8 @@ public class UserControllerTest{
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
-        ResponseEntity<UserPassword> response = restTemplate
-                .exchange(url(), HttpMethod.POST, new HttpEntity<>(newUser, headers), UserPassword.class);
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url(), HttpMethod.POST, new HttpEntity<>(newUser, headers), CreatedUser.class);
         // THEN
 
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
