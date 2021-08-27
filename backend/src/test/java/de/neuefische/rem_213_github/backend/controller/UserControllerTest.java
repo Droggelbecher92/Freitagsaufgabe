@@ -189,4 +189,40 @@ public class UserControllerTest {
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
     }
 
+
+   /* @Test
+    public void testResetPassword(){
+        String username = "bill";
+        String password = "12345";
+        String role = "user";
+
+        String hashedPassword = passwordEncoder.encode(password);
+        userRepository.save(
+                UserEntity.builder()
+                        .name(username)
+                        .role(role)
+                        .password(hashedPassword).build()
+        );
+        Instant now = Instant.now();
+        Date iat = Date.from(now);
+        Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
+        String token = Jwts.builder()
+                .setClaims(new HashMap<>(
+                        Map.of("role", "ADMIN")
+                ))
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .setSubject("max")
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret()).compact();
+
+        // When
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        String url = url() + "/bill/reset-password";
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url, HttpMethod.PUT, new HttpEntity<>(headers), CreatedUser.class);
+
+
+    }
+*/
 }
