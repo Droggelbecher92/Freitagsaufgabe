@@ -63,7 +63,8 @@ public class UserController {
     public ResponseEntity<User> create(@RequestBody User user) {
         try {
             UserEntity userEntity = map(user);
-
+            userEntity.setPassword(userService.generatePassword());
+            userEntity.setRole("USER");
             UserEntity createdUserEntity = userService.create(userEntity);
             User createdUser = map(createdUserEntity);
             return ok(createdUser);

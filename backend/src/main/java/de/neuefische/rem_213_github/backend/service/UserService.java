@@ -6,6 +6,7 @@ import de.neuefische.rem_213_github.backend.model.UserEntity;
 import de.neuefische.rem_213_github.backend.repo.UserRepository;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,10 @@ public class UserService {
             userRepository.delete(userEntity);
         }
         return userEntityOptional;
+    }
+
+    public String generatePassword(){
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 
     public List<UserEntity> findAll() {
