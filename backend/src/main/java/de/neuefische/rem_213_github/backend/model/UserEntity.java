@@ -1,9 +1,7 @@
 package de.neuefische.rem_213_github.backend.model;
 
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,6 +21,9 @@ import java.util.Set;
 @Table(name = "rem_user")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
@@ -37,8 +38,14 @@ public class UserEntity {
     @Column(name = "user_name", nullable = false, unique = true)
     private String name;
 
+    @Column(name = "user_password", nullable = false)
+    private String password;
+
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Column(name ="user_role")
+    private String role;
 
     public Set<RepoEntity> getRepos() {
         // protect inner repo set for modification from outside

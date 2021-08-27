@@ -40,6 +40,7 @@ public class UserEntityTest extends SpringBootTests {
     public void testCreateUserName() {
         UserEntity userEntity = new UserEntity();
         userEntity.setName("foo");
+        userEntity.setPassword("password");
         assertNull(userEntity.getId());
 
         UserEntity createdEntity = userRepository.save(userEntity);
@@ -59,6 +60,7 @@ public class UserEntityTest extends SpringBootTests {
         // GIVEN
         UserEntity userEntity = new UserEntity();
         userEntity.setName("foo");
+        userEntity.setPassword("password");
         UserEntity expectedUser = userRepository.save(userEntity);
 
         // WHEN
@@ -81,6 +83,7 @@ public class UserEntityTest extends SpringBootTests {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setName("foo");
+        userEntity.setPassword("password");
         userEntity.setRepos(repoEntities);
 
         // WHEN
