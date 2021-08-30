@@ -190,7 +190,7 @@ public class UserControllerTest {
     }
 
 
-   /* @Test
+    @Test
     public void testResetPassword(){
         String username = "bill";
         String password = "12345";
@@ -203,6 +203,7 @@ public class UserControllerTest {
                         .role(role)
                         .password(hashedPassword).build()
         );
+        //who is logged in?
         Instant now = Instant.now();
         Date iat = Date.from(now);
         Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
@@ -222,7 +223,15 @@ public class UserControllerTest {
         ResponseEntity<CreatedUser> response = restTemplate
                 .exchange(url, HttpMethod.PUT, new HttpEntity<>(headers), CreatedUser.class);
 
+        //Then
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        CreatedUser actual = response.getBody();
+            //check if user to be updated is really bill:
+        assertThat(actual.getUsername(),is("bill"));
+
+        assertThat(actual.getPassword(),not("12345"));
+
 
     }
-*/
+
 }
