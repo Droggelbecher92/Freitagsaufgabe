@@ -231,6 +231,137 @@ public class UserControllerTest {
 
         assertThat(actual.getPassword(),not("12345"));
 
+    }
+
+    @Test
+    public void deleteUserByAdmin(){
+
+        //Given
+        String username = "bill";
+        String password = "12345";
+        String role = "user";
+
+        String hashedPassword = passwordEncoder.encode(password);
+        userRepository.save(
+                UserEntity.builder()
+                        .name(username)
+                        .role(role)
+                        .password(hashedPassword).build()
+        );
+        //who is logged in?
+        Instant now = Instant.now();
+        Date iat = Date.from(now);
+        Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
+        String token = Jwts.builder()
+                .setClaims(new HashMap<>(
+                        Map.of("role", "ADMIN")
+                ))
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .setSubject("max")
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret()).compact();
+
+        // When
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        String url = url() + "/bill";
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url, HttpMethod.DELETE, new HttpEntity<>(headers), CreatedUser.class);
+
+        //Then
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(userRepository.findByName("bill"),is(Optional.empty()));
+
+
+    }
+
+
+    @Test
+    public void deleteUserByUserNotAllowed(){
+
+        //Given
+
+        String username = "bill";
+        String password = "12345";
+        String role = "user";
+
+        String hashedPassword = passwordEncoder.encode(password);
+        UserEntity user = UserEntity.builder()
+                .name(username)
+                .role(role)
+                .password(hashedPassword).build();
+
+        userRepository.save(user);
+
+
+        //who is logged in?
+        Instant now = Instant.now();
+        Date iat = Date.from(now);
+        Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
+        String token = Jwts.builder()
+                .setClaims(new HashMap<>(
+                        Map.of("role", "USER")
+                ))
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .setSubject("max")
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret()).compact();
+
+        // When
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        String url = url() + "/bill";
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url, HttpMethod.DELETE, new HttpEntity<>(headers), CreatedUser.class);
+
+        //Then
+        assertThat(response.getStatusCode(),is(HttpStatus.UNAUTHORIZED));
+        assertThat(userRepository.findByName("bill"),is(Optional.of(user)));
+
+
+    }
+
+    @Test
+    public void deleteUserByUserAllowed(){
+
+        //Given
+
+        String username = "bill";
+        String password = "12345";
+        String role = "user";
+
+        String hashedPassword = passwordEncoder.encode(password);
+        UserEntity user = UserEntity.builder()
+                .name(username)
+                .role(role)
+                .password(hashedPassword).build();
+
+        userRepository.save(user);
+
+
+        //who is logged in?
+        Instant now = Instant.now();
+        Date iat = Date.from(now);
+        Date exp = Date.from(now.plus(Duration.ofMinutes(jwtConfig.getExpiresAfterMinutes())));
+        String token = Jwts.builder()
+                .setClaims(new HashMap<>(
+                        Map.of("role", "USER")
+                ))
+                .setIssuedAt(iat)
+                .setExpiration(exp)
+                .setSubject("bill")
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret()).compact();
+
+        // When
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        String url = url() + "/bill";
+        ResponseEntity<CreatedUser> response = restTemplate
+                .exchange(url, HttpMethod.DELETE, new HttpEntity<>(headers), CreatedUser.class);
+
+        //Then
+        assertThat(response.getStatusCode(),is(HttpStatus.OK));
+        assertThat(userRepository.findByName("bill"),is(Optional.empty()));
 
     }
 

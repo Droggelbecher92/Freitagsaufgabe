@@ -111,14 +111,19 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(code = SC_NOT_FOUND, message = "User not found")
     })
-    public ResponseEntity<User> delete(@PathVariable String name) {
-        Optional<UserEntity> userEntityOptional = userService.delete(name);
-        if (userEntityOptional.isPresent()) {
-            UserEntity userEntity = userEntityOptional.get();
-            User user = map(userEntity);
-            return ok(user);
+    public ResponseEntity<User> delete(@PathVariable String name,@AuthenticationPrincipal UserEntity loggedInUser) {
+        if(loggedInUser.getRole().equals("ADMIN")|| loggedInUser.getName().equals(name)){
+            Optional<UserEntity> userEntityOptional = userService.delete(name);
+            if (userEntityOptional.isPresent()) {
+                UserEntity userEntity = userEntityOptional.get();
+                User user = map(userEntity);
+                return ok(user);
+            }
+            return ResponseEntity.notFound().build();
+
         }
-        return ResponseEntity.notFound().build();
+        return  ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
     @PutMapping(value = "/password",produces = APPLICATION_JSON_VALUE,consumes = APPLICATION_JSON_VALUE)
